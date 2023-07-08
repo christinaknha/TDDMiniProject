@@ -16,19 +16,19 @@ public class OrderService  {
         this.orderRepository = orderRepository;
     }
 
-//  Method to create/save an order
+    //  Method to create/save an order
     public OrderEntity saveOrder(OrderEntity order){
         return orderRepository.save(order);
     }
 
-//  Method to read all orders
+    //  Method to read all orders
     public List<OrderEntity> getAllOrders(){
         orderRepository.save(new OrderEntity("Customer 1", LocalDate.now(), "Address 1", 10.0));
 
         return orderRepository.findAll();
     }
 
-//  Method to update an order
+    //  Method to update an order
     public Optional<OrderEntity> updateOrder(Long id, OrderEntity orderToUpdate){
         Optional<OrderEntity> orderExists = orderRepository.findById(id);
         if (orderExists.isPresent()){
@@ -42,7 +42,8 @@ public class OrderService  {
         return Optional.empty();
     }
 
-//  Method to delete order
+
+    //  Method to delete order
     public boolean deleteOrder(Long id){
         if (orderRepository.findById(id).isPresent()){
             orderRepository.deleteById(id);
@@ -51,4 +52,10 @@ public class OrderService  {
         return false;
     }
 
-}
+    public Optional<OrderEntity> getOrderById(Long id){
+        return orderRepository.findById(id);
+
+        }
+    }
+
+

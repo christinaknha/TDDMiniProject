@@ -4,6 +4,9 @@ package com.example.TDDMiniProject;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.NonNull;
 
 import java.time.LocalDate;
 
@@ -12,12 +15,15 @@ public class OrderEntity {
 
     @Id @GeneratedValue
     public Long id;
+
+    @NotEmpty(message = "Customer name is required")
     public String customerName;
 
     public LocalDate orderDate;
-
+    @NotEmpty(message = "Shipping address name is required")
     public String shippingAddress;
 
+    @Min(value = 0)
     public Double total;
 
 

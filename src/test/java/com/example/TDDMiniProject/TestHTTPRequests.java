@@ -11,11 +11,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
@@ -51,18 +49,18 @@ public class TestHTTPRequests {
                         .content(asJsonString(order))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
-
-
     }
 
     @Test
     public void testUpdateApi() throws Exception {
-        OrderEntity updatedOrder = new OrderEntity("name2", LocalDate.now(), "address2", 10.99);
-//        OrderEntity orderToUpdate = new OrderEntity("name1", LocalDate.now(), "address1", 10.99);
+        OrderEntity orderToUpdate = new OrderEntity("name1", LocalDate.now(), "address1", 10.99);
+        OrderEntity savedOrder = orderService.saveOrder(orderToUpdate);
 
+        OrderEntity updatedOrder = new OrderEntity("name2", LocalDate.now(), "address2", 10.99);
+        updatedOrder.setId(savedOrder.getId());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .put("/update-{id}", 1L)
+                        .put("/update/{id}", updatedOrder.getId())
                         .content(asJsonString(updatedOrder))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -70,9 +68,12 @@ public class TestHTTPRequests {
 
     @Test
     public void testDeleteApi() throws Exception {
+        OrderEntity order = new OrderEntity("name2", LocalDate.now(), "address2", 10.99);
+        orderService.saveOrder(order);
+
         mockMvc.perform(MockMvcRequestBuilders
-                .delete("/delete-{id}", 1L))
-                .andExpect(status().isNotFound());
+                .delete("/delete/{id}", order.getId()))
+                .andExpect(status().isOk());
     }
 
     public static String asJsonString(final Object object) {
@@ -86,4 +87,59 @@ public class TestHTTPRequests {
         }
     }
 
+    @Test
+    public void emptyCustomerNameField() throws Exception{
+       OrderEntity orderToAdd= new OrderEntity("", LocalDate.now(), "address1", 10.99);
+
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/create")
+                .content(asJsonString(orderToAdd))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void emptyAddressField() throws Exception{
+        OrderEntity orderToAdd= new OrderEntity("name", LocalDate.now(), "", 10.99);
+
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/create")
+                        .content(asJsonString(orderToAdd))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void lessThanZeroTotalField() throws Exception{
+        OrderEntity orderToAdd= new OrderEntity("name", LocalDate.now(), "address", -2.99);
+
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/create")
+                        .content(asJsonString(orderToAdd))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void deleteNonExistantApi() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/delete/{id}", 1L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updateNonExistantApi() throws Exception {
+        OrderEntity updatedOrder = new OrderEntity("name2", LocalDate.now(), "address2", 10.99);
+//        OrderEntity orderToUpdate = new OrderEntity("name1", LocalDate.now(), "address1", 10.99);
+        int lengthAPI = orderService.getAllOrders().size();
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/update/{id}", lengthAPI)
+                        .content(asJsonString(updatedOrder))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }

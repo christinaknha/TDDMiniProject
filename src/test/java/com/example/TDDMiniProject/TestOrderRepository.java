@@ -17,10 +17,7 @@ public class TestOrderRepository {
     @Autowired
     private OrderRepository orderRepository;
 
-    //  test for saveOrder
     @Test
-    @org.junit.jupiter.api.Order(1)
-//    @Rollback(value=false)
     public void saveOrderTest(){
 //    instantiate an example order
         OrderEntity order = new OrderEntity("hanhi", LocalDate.now(), "1234 Anywhere St.", 59.99);
@@ -33,7 +30,7 @@ public class TestOrderRepository {
     }
 
     @Test
-    @org.junit.jupiter.api.Order(2)
+//    @org.junit.jupiter.api.Order(2)
     public void getOrderTest(){
 
         OrderEntity order = new OrderEntity("hanhi", LocalDate.now(), "1234 Anywhere St.", 59.99);
@@ -47,7 +44,7 @@ public class TestOrderRepository {
     }
 
     @Test
-    @org.junit.jupiter.api.Order(3)
+//    @org.junit.jupiter.api.Order(3)
     public void getAllOrderTest(){
 
         OrderEntity order = new OrderEntity("hanhi", LocalDate.now(), "1234 Anywhere St.", 59.99);
@@ -59,7 +56,7 @@ public class TestOrderRepository {
     }
 
     @Test
-    @org.junit.jupiter.api.Order(4)
+//    @org.junit.jupiter.api.Order(4)
     public void updateOrderTest(){
 
         OrderEntity order = new OrderEntity("hanhi", LocalDate.now(), "1234 Anywhere St.", 59.99);
@@ -76,7 +73,7 @@ public class TestOrderRepository {
     }
 
     @Test
-    @org.junit.jupiter.api.Order(5)
+//    @org.junit.jupiter.api.Order(5)
     public void deleteOrderTest(){
 
         OrderEntity order = new OrderEntity("hanhi", LocalDate.now(), "1234 Anywhere St.", 59.99);
