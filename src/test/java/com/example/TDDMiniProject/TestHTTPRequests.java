@@ -5,19 +5,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
-@WebMvcTest(OrderController.class)
+@AutoConfigureMockMvc
+@SpringBootTest
 public class TestHTTPRequests {
 
     @Autowired
@@ -31,6 +37,9 @@ public class TestHTTPRequests {
 
     @Test
     public void getAllOrdersApi() throws Exception{
+        OrderEntity order = new OrderEntity("hanhi", LocalDate.now(), "123 Anywhere St", 10.00);
+        Mockito.when(orderService.getAllOrders()).thenReturn(List.of(order));
+
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders")
                 .accept(MediaType.APPLICATION_JSON))
@@ -40,8 +49,8 @@ public class TestHTTPRequests {
 
     @Test
     public void createOrderApi() throws Exception {
-        // Create a sample OrderEntity object for testing
-        OrderEntity order = new OrderEntity("name", LocalDate.now(), "address", 10.99);
+        OrderEntity order = new OrderEntity("hanhi", LocalDate.now(), "123 Anywhere St", 10.00);
+        Mockito.when(orderService.saveOrder(Mockito.any())).thenReturn(order);
 
         // Perform the POST request to the "/create" endpoint
         mockMvc.perform(MockMvcRequestBuilders
@@ -53,14 +62,12 @@ public class TestHTTPRequests {
 
     @Test
     public void testUpdateApi() throws Exception {
-        OrderEntity orderToUpdate = new OrderEntity("name1", LocalDate.now(), "address1", 10.99);
-        OrderEntity savedOrder = orderService.saveOrder(orderToUpdate);
+        OrderEntity updatedOrder = new OrderEntity("C. Ha", LocalDate.now(), "456 Somewhere Way", 20.00);
+        Mockito.when(orderService.updateOrder(Mockito.any(), Mockito.any())).thenReturn(Optional.of(updatedOrder));
 
-        OrderEntity updatedOrder = new OrderEntity("name2", LocalDate.now(), "address2", 10.99);
-        updatedOrder.setId(savedOrder.getId());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .put("/update/{id}", updatedOrder.getId())
+                        .put("/update/{id}", 1L)
                         .content(asJsonString(updatedOrder))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -68,11 +75,10 @@ public class TestHTTPRequests {
 
     @Test
     public void testDeleteApi() throws Exception {
-        OrderEntity order = new OrderEntity("name2", LocalDate.now(), "address2", 10.99);
-        orderService.saveOrder(order);
+        Mockito.when(orderService.deleteOrder(Mockito.any())).thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders
-                .delete("/delete/{id}", order.getId()))
+                .delete("/delete/{id}", 1L))
                 .andExpect(status().isOk());
     }
 
@@ -90,6 +96,7 @@ public class TestHTTPRequests {
     @Test
     public void emptyCustomerNameField() throws Exception{
        OrderEntity orderToAdd= new OrderEntity("", LocalDate.now(), "address1", 10.99);
+       Mockito.when(orderService.saveOrder(Mockito.any())).thenReturn(orderToAdd);
 
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -102,6 +109,7 @@ public class TestHTTPRequests {
     @Test
     public void emptyAddressField() throws Exception{
         OrderEntity orderToAdd= new OrderEntity("name", LocalDate.now(), "", 10.99);
+        Mockito.when(orderService.saveOrder(Mockito.any())).thenReturn(orderToAdd);
 
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -114,6 +122,7 @@ public class TestHTTPRequests {
     @Test
     public void lessThanZeroTotalField() throws Exception{
         OrderEntity orderToAdd= new OrderEntity("name", LocalDate.now(), "address", -2.99);
+        Mockito.when(orderService.saveOrder(Mockito.any())).thenReturn(orderToAdd);
 
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -132,12 +141,10 @@ public class TestHTTPRequests {
 
     @Test
     public void updateNonExistantApi() throws Exception {
-        OrderEntity updatedOrder = new OrderEntity("name2", LocalDate.now(), "address2", 10.99);
-//        OrderEntity orderToUpdate = new OrderEntity("name1", LocalDate.now(), "address1", 10.99);
-        int lengthAPI = orderService.getAllOrders().size();
+        OrderEntity updatedOrder = new OrderEntity("C. Ha", LocalDate.now(), "456 Somewhere Way", 20.00);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .put("/update/{id}", lengthAPI)
+                        .put("/update/{id}", 1L)
                         .content(asJsonString(updatedOrder))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
