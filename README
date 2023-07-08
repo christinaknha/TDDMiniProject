@@ -1,0 +1,54 @@
+To test the code, user should first start by running the TestOrderRepository class under the Test folder. 
+This test starts by with an orderRepository injection.
+
+The first test in this class test whether or not an order can be saved to a repository. It determines that by running the .save() method and then
+checking to see if the id generated for the order is greater than zero. 
+If so, then it shows that the order has been added.
+
+The second test checks to see if you can retrieve an order from the repository.
+It starts by adding an order to the respository and then searching for it by it's id. 
+If an order is found and the id of the order matches the order that was added, 
+then it shows that the method works.
+
+the third test checks to see if all orders can be retrieved.
+It starts by adding an order to the respository and then making a list of all of the orders in the repository.
+If the list is populated/is not empty, then the .findAll() method worked.
+
+The fourth test checks to see if an order can be updated. 
+It starts by adding an order to the respository and then searching for it by it's id.
+It then updates name of the customer of the order that was returned during the search and saves it to the repository.
+Lastly, it checks to see if the customer name of the order just stored in the repository is the same as the updated name.
+If so, then the order has been updated.
+
+The last test on this page checks to see if an order can be deleted.
+It starts by adding an order to the respository and then deletes the order.
+It then searches for the order that was initially added.
+If it is unable to find it, then the order has been deleted.
+
+Once user is done running the TestOrderRepository, they can run the TestHTTPRequests.
+
+In this class, a MockMvc, mock orderService, and ObjectMapper is injected.
+
+The first test checks to see if the HTTP request that gets all orders can be fullfilled. 
+It creates a mockMvc to simulate the HTTP get request to the enpoint url /orders.
+It is looking for a JSON response and then prints that information.
+We expect the status to be OK/200 indicating that the information was returned correctly.
+
+The second test checks to see if the HTTP request that creates an order that can be fullfilled.
+The first thing that is done is an order is instantiated
+Then a mockMvc is created to simulate the HTTP post request to the enpoint url /orders.
+It then converts the instantiated order to a JSON string before turning/adding it to the JSON.
+If it is done correctly, a created status is expected.
+
+The third test is similar to the second test but instead of simulating a post request, it simulates
+a put request to the endpoint /update/{id}, where {id} is the id of the post that is to be updated.
+
+The fourth test cheks to see if the HTTP request that deletes an order can be fulfilled. 
+A mockMvc is created to simulate the HTTP post request to the enpoint url /delete/{id}, where {id} is the id of the post that is to be deleted.
+If it is deleted, then the status is expected return Ok. 
+
+The next three tests are similar to that of the second test with the exception that they are expected to return
+a bad request due to the object constructor not being filled out correctly.
+
+The last two test try to delete and update a nonexistant order based on id.
+These are expected to return a not found status since the orders don't exist.
